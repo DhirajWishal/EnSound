@@ -17,7 +17,7 @@ namespace EnSound
 
 		inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
 
-		const RIFFChunk* FindChunk(_In_reads_bytes_(sizeBytes) const uint8* data, _In_ uint64 sizeBytes, _In_ WAVFileTag tag)
+		const RIFFChunk* FindChunk(const uint8* data, uint64 sizeBytes, WAVFileTag tag)
 		{
 			if (!data)
 				return nullptr;

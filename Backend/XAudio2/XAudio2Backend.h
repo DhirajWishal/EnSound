@@ -72,9 +72,9 @@ namespace EnSound
 
 		public:
 			/**
-			 * Play audio once directly from the file. 
+			 * Play audio once directly from the file.
 			 * Note that this does not stream data directly to the device!
-			 * 
+			 *
 			 * @param pAsset: The asset path.
 			 */
 			void PlayAudioOnce(const wchar* pAsset);
@@ -85,6 +85,22 @@ namespace EnSound
 			 * @param mHandle: The audio object handle.
 			 */
 			void PlayAudioOnce(AudioObjectHandle mHandle);
+
+			/**
+			 * Loop the audio multiple times.
+			 *
+			 * @param pAsset: The asset path.
+			 * @param loopCount: The number of times the audio should be played.
+			 */
+			void PlayLoop(const wchar* pAsset, uint64 loopCount);
+
+			/**
+			 * Loop the audio multiple times.
+			 *
+			 * @param mHandle: The audio object handle.
+			 * @param loopCount: The number of times the audio should be played.
+			 */
+			void PlayLoop(AudioObjectHandle mHandle, uint64 loopCount);
 
 		private:
 			Microsoft::WRL::ComPtr<IXAudio2> pXAudio2;	// XAudio2 instance.

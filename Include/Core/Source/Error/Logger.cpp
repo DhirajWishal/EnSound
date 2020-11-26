@@ -39,11 +39,11 @@ namespace EnSound
 		}
 
 		Vector<const wchar*> LOG_INFO = {
-			TEXT("INFO-> "),
-			TEXT("WARN-> "),
-			TEXT("ERROR-> "),
-			TEXT("FATAL-> "),
-			TEXT("DEBUG-> "),
+			STRING("INFO-> "),
+			STRING("WARN-> "),
+			STRING("ERROR-> "),
+			STRING("FATAL-> "),
+			STRING("DEBUG-> "),
 		};
 
 		/**
@@ -59,7 +59,7 @@ namespace EnSound
 			changeToColor(severity);
 
 			_wstrtime_s(tmpBuff, 128);
-			wprintf(TEXT("[%s] %s%s%s\n"), tmpBuff, LOG_INFO[severity], msg, normal);
+			wprintf(STRING("[%s] %s%s%s\n"), tmpBuff, LOG_INFO[severity], msg, normal);
 		}
 
 		void LogInfo(const wchar* message)
@@ -83,7 +83,7 @@ namespace EnSound
 		void LogFatal(const wchar* message, const wchar* file, uint32 line)
 		{
 			changeToColor(3);
-			wprintf(TEXT("[%s:%u] %s%s%s\n"), file, line, LOG_INFO[3], message, normal);
+			wprintf(STRING("[%s:%u] %s%s%s\n"), file, line, LOG_INFO[3], message, normal);
 		}
 
 		void LogDebug(const wchar* message)

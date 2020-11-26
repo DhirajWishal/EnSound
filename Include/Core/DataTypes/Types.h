@@ -22,7 +22,7 @@ typedef wchar_t wchar;
 typedef std::string String;
 typedef std::wstring WString;
 
-#define TEXT(...) L##__VA_ARGS__
+#define STRING(...) L##__VA_ARGS__
 
 template<class Type, class Alloc = std::allocator<Type>>
 using Vector = std::vector<Type, Alloc>;

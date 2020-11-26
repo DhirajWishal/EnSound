@@ -6,31 +6,13 @@
 
 #include "Core/Error/Logger.h"
 #include "XAudio2/Loaders/WAVLoader.h"
+#include "XAudio2/Utilities/Converters.h"
+#include "XAudio2/Utilities/ObjectCreators.h"
 
 namespace EnSound
 {
 	namespace XAudio2
 	{
-		/**
-		 * Get WAVFormat data and insert it to the WAVEFORAMATEX structure.
-		 *
-		 * @param mFormat: The WAVFormat structure.
-		 * @return WAVEFORMATEX structure.
-		 */
-		WAVEFORMATEX WAVFormatToWAVEFORMAT(const WAVFormat& mFormat)
-		{
-			WAVEFORMATEX mWaveFormat = {};
-			mWaveFormat.wFormatTag = mFormat.mFormatTag;
-			mWaveFormat.nChannels = mFormat.mChannels;
-			mWaveFormat.nSamplesPerSec = static_cast<uint32>(mFormat.mSampleRate);
-			mWaveFormat.nAvgBytesPerSec = static_cast<uint32>(mFormat.mAvgByteRate);
-			mWaveFormat.nBlockAlign = mFormat.mBlockAlignment;
-			mWaveFormat.wBitsPerSample = mFormat.mBitsPerSample;
-			mWaveFormat.cbSize = mFormat.mCBSize;
-
-			return mWaveFormat;
-		}
-
 		void XAudio2Backend::Initialize()
 		{
 			// Initialize the COINIT.
@@ -39,7 +21,7 @@ namespace EnSound
 			// Create the XAudio2 instance.
 			if (FAILED(XAudio2Create(pXAudio2.GetAddressOf(), 0)))
 			{
-				Logger::LogError(TEXT("Failed to create the XAudio2 instance!"));
+				Logger::LogError(STRING("Failed to create the XAudio2 instance!"));
 				CoUninitialize();
 				return;
 			}
@@ -56,7 +38,7 @@ namespace EnSound
 			// Create the XAudio2 mastering voice.
 			if (FAILED(pXAudio2->CreateMasteringVoice(&pMasteringVoice)))
 			{
-				Logger::LogError(TEXT("Failed to create the XAudio2 mastering voice!"));
+				Logger::LogError(STRING("Failed to create the XAudio2 mastering voice!"));
 				CoUninitialize();
 				return;
 			}
@@ -64,78 +46,10 @@ namespace EnSound
 
 		void XAudio2Backend::Terminate()
 		{
-			// Terminate all the audio objects before terminating the backend.
-			for (auto itr = mAudioObjects.begin(); itr != mAudioObjects.end(); itr++)
-				itr->GetSourcePointer()->DestroyVoice();
-
+			mAudioObjects.clear();
 			pMasteringVoice->DestroyVoice();
 			pXAudio2.Reset();
 			CoUninitialize();
-		}
-
-		/**
-		 * Create an audio object using a WAV file.
-		 *
-		 * @param pAsset: The audio file path.
-		 * @param pInstance: The XAudio2 instance.
-		 * @param pHandle: The Audio Object Handle object pointer. Default is nullptr.
-		 */
-		AudioObject CreateFromWAV(const wchar* pAsset, IXAudio2* pInstance, AudioObjectHandle* pHandle = nullptr)
-		{
-			AudioObject mObject = {};
-			WAVData wavData = {};
-			uint8* pData = nullptr;
-
-			// Load audio data.
-			if (FAILED(LoadWAVAudioFromFileEx(pAsset, &pData, wavData)))
-				Logger::LogError(TEXT("Failed to load the WAV file!"));
-
-			// Set handle data if needed.
-			if (pHandle)
-			{
-				pHandle->mFileType = AudioFileType::AUDIO_FILE_TYPE_WAV;
-				pHandle->mBytesPerSecond = wavData.mWAVFormat.mAvgByteRate;
-				pHandle->mLength = wavData.mLoopLength;
-				pHandle->mSampleRate = wavData.mWAVFormat.mSampleRate;
-			}
-
-			// Create source voice.
-			auto format = WAVFormatToWAVEFORMAT(wavData.mWAVFormat);
-			pInstance->CreateSourceVoice(mObject.GetSourceDataPointer(), &format);
-
-			XAUDIO2_BUFFER buffer = { 0 };
-			buffer.pAudioData = wavData.pStartAudio;
-			buffer.Flags = XAUDIO2_END_OF_STREAM;  // tell the source voice not to expect any data after this buffer
-			buffer.AudioBytes = wavData.mAudioBytes;
-
-			if (wavData.mLoopLength > 0)
-			{
-				buffer.LoopBegin = wavData.mLoopStart;
-				buffer.LoopLength = wavData.mLoopLength;
-				buffer.LoopCount = 1; // We'll just assume we play the loop twice
-			}
-
-			if (wavData.pSeek)
-			{
-				XAUDIO2_BUFFER_WMA xwmaBuffer = { 0 };
-				xwmaBuffer.pDecodedPacketCumulativeBytes = wavData.pSeek;
-				xwmaBuffer.PacketCount = wavData.mSeekCount;
-
-				if (FAILED(mObject.GetSourcePointer()->SubmitSourceBuffer(&buffer, &xwmaBuffer)))
-				{
-					Logger::LogError(TEXT("Failed to submit source buffer!"));
-					mObject.GetSourcePointer()->DestroyVoice();
-					return AudioObject();
-				}
-			}
-			else if (FAILED(mObject.GetSourcePointer()->SubmitSourceBuffer(&buffer)))
-			{
-				Logger::LogError(TEXT("Failed to submit source buffer!"));
-				mObject.GetSourcePointer()->DestroyVoice();
-				return AudioObject();
-			}
-
-			return mObject;
 		}
 
 		AudioObjectHandle XAudio2Backend::CreateAudioObject(const wchar* pAsset)
@@ -145,8 +59,8 @@ namespace EnSound
 			mHandle.pFileName = pAsset;
 
 			// Create the object from using the WAV format.
-			if (WString(pAsset).find(TEXT(".wav")) != WString::npos)
-				mAudioObjects.insert(mAudioObjects.end(), std::move(CreateFromWAV(pAsset, GetInstance(), &mHandle)));
+			if (WString(pAsset).find(STRING(".wav")) != WString::npos)
+				mAudioObjects.insert(mAudioObjects.end(), std::move(CreateFromWAV(pAsset, &mHandle)));
 
 			// Get the handle and return it.
 			mHandle.mHandle = mAudioObjects.size() - 1;
@@ -164,11 +78,11 @@ namespace EnSound
 			AudioObject mObject = {};
 
 			// Play the WAV file once.
-			if (WString(pAsset).find(TEXT(".wav")) != WString::npos)
-				mObject = std::move(CreateFromWAV(pAsset, GetInstance()));
+			if (WString(pAsset).find(STRING(".wav")) != WString::npos)
+				mObject = std::move(CreateFromWAV(pAsset));
 
 			// Play the audio.
-			mObject.PlayOnce();
+			mObject.PlayOnce(GetInstance());
 
 			// Terminate the object.
 			mObject.Terminate();
@@ -176,7 +90,34 @@ namespace EnSound
 
 		void XAudio2Backend::PlayAudioOnce(AudioObjectHandle mHandle)
 		{
-			mAudioObjects.at(mHandle.GetHandle()).PlayOnce();
+			(mAudioObjects.data() + mHandle.GetHandle())->PlayOnce(GetInstance());
+		}
+
+		void XAudio2Backend::PlayLoop(const wchar* pAsset, uint64 loopCount)
+		{
+			// Create the object instance.
+			AudioObject mObject = {};
+
+			// Play the WAV file once.
+			if (WString(pAsset).find(STRING(".wav")) != WString::npos)
+				mObject = std::move(CreateFromWAV(pAsset));
+
+			// Play the audio.
+			while (loopCount--)
+				mObject.PlayOnce(GetInstance());
+
+			// Terminate the object.
+			mObject.Terminate();
+		}
+
+		void XAudio2Backend::PlayLoop(AudioObjectHandle mHandle, uint64 loopCount)
+		{
+			// Get the required audio object.
+			auto pAudioObject = (mAudioObjects.data() + mHandle.GetHandle());
+
+			// Play the audio file.
+			while (loopCount--)
+				pAudioObject->PlayOnce(GetInstance());
 		}
 	}
 }

@@ -8,9 +8,9 @@ int main()
 	EnSound::XAudio2::XAudio2Backend mBackend;
 	mBackend.Initialize();
 
-	mBackend.PlayAudioOnce(TEXT("..\\..\\Assets\\Audio\\Gun+357+Magnum.wav"));
+	mBackend.PlayLoop(STRING("..\\..\\Assets\\Audio\\Gun+357+Magnum.wav"), 5);
 
-	auto mHandle = mBackend.CreateAudioObject(TEXT("..\\..\\Assets\\Audio\\file_example_WAV_10MG.wav"));
+	auto mHandle = mBackend.CreateAudioObject(STRING("..\\..\\Assets\\Audio\\file_example_WAV_10MG.wav"));
 	mBackend.PlayAudioOnce(mHandle);
 
 	mBackend.Terminate();

@@ -5,5 +5,5 @@
 
 int main()
 {
-	EnSound::Logger::LogInfo(TEXT("Welcome to EnSound!"));
+	EnSound::Logger::LogInfo(STRING("Welcome to EnSound!"));
 }

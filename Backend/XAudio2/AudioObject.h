@@ -48,11 +48,37 @@ namespace EnSound
 
 			/**
 			 * Play the audio once.
+			 *
+			 * @param pInstance: The IXAudio2 pointer.
 			 */
-			void PlayOnce();
+			void PlayOnce(IXAudio2* pInstance);
+
+			/**
+			 * Get the buffer address.
+			 *
+			 * @return XAUDIO2_BUFFER pointer.
+			 */
+			XAUDIO2_BUFFER* GetBufferAddress() const { return const_cast<XAUDIO2_BUFFER*>(&mBuffer); }
+
+			/**
+			 * Get the XWMA buffer address.
+			 *
+			 * @return XAUDIO2_BUFFER pointer.
+			 */
+			XAUDIO2_BUFFER_WMA* GetBufferXWMAAddress() const { return const_cast<XAUDIO2_BUFFER_WMA*>(&mXWMABuffer); }
+
+			/**
+			 * Get the address of the Wave Format structure.
+			 * 
+			 * @return WAVEFORMATEX pointer.
+			 */
+			WAVEFORMATEX* GetWaveFormatAddress() const { return const_cast<WAVEFORMATEX*>(&mWaveFromat); }
 
 		private:
 			IXAudio2SourceVoice* pSourceData = nullptr;	// Audio source data.
+			XAUDIO2_BUFFER mBuffer = { 0 }; // Audio data buffer.
+			XAUDIO2_BUFFER_WMA mXWMABuffer = { 0 };	// XWMA audio data buffer.
+			WAVEFORMATEX mWaveFromat = {};	// The wave format.
 		};
 	}
 }
