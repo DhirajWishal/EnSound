@@ -22,6 +22,7 @@ project "XAudio2Tests"
 
 	includedirs {
 		"$(SolutionDir)Include",
+		"$(SolutionDir)Backend",
 		"$(SolutionDir)Tests/XAudio2Tests",
 	}
 

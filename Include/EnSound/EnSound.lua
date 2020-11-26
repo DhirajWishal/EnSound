@@ -28,6 +28,7 @@ project "EnSound"
 
 	includedirs {
 		"$(SolutionDir)Include/",
+		"$(SolutionDir)Backend/",
 	}
 
 	libdirs {
@@ -35,5 +36,5 @@ project "EnSound"
 	}
 
 	links { 
-		"Loader",
+		"XAudio2",
 	}

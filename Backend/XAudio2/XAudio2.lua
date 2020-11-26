@@ -28,6 +28,7 @@ project "XAudio2"
 
 	includedirs {
 		"$(SolutionDir)Include/",
+		"$(SolutionDir)Backend/",
 	}
 
 	libdirs {

@@ -28,6 +28,7 @@ project "Core"
 
 	includedirs {
 		"$(SolutionDir)Include/",
+		"$(SolutionDir)Backend/",
 	}
 
 	libdirs {

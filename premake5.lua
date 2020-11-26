@@ -40,7 +40,6 @@ IncludeLib["SDL2"] = "$(SolutionDir)Dependencies/ThirdParty/Binaries/SDL2-2.0.12
 group "Include"
 include "Include/Core/Core.lua"
 include "Include/EnSound/EnSound.lua"
-include "Include/Loader/Loader.lua"
 
 group "Backends"
 include "Backend/XAudio2/XAudio2.lua"
@@ -48,6 +47,5 @@ include "Backend/XAudio2/XAudio2.lua"
 group "Tests"
 include "Tests/CoreTests/CoreTests.lua"
 include "Tests/EnSoundTests/EnSoundTests.lua"
-include "Tests/LoaderTests/LoaderTests.lua"
 
 include "Tests/XAudio2Tests/XAudio2Tests.lua"
